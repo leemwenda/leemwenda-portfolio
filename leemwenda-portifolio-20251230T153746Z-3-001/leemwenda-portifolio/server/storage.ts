@@ -1,0 +1,35 @@
+import { db } from "./db";
+import {
+  skills, projects,
+  type Skill, type InsertSkill,
+  type Project, type InsertProject
+} from "@shared/schema";
+
+export interface IStorage {
+  getSkills(): Promise<Skill[]>;
+  createSkill(skill: InsertSkill): Promise<Skill>;
+  getProjects(): Promise<Project[]>;
+  createProject(project: InsertProject): Promise<Project>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getSkills(): Promise<Skill[]> {
+    return await db.select().from(skills);
+  }
+
+  async createSkill(insertSkill: InsertSkill): Promise<Skill> {
+    const [skill] = await db.insert(skills).values(insertSkill).returning();
+    return skill;
+  }
+
+  async getProjects(): Promise<Project[]> {
+    return await db.select().from(projects);
+  }
+
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const [project] = await db.insert(projects).values(insertProject).returning();
+    return project;
+  }
+}
+
+export const storage = new DatabaseStorage();
